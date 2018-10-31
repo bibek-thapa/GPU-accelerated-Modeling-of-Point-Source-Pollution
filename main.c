@@ -3,8 +3,8 @@
 // Program to add two vectors using a GPU
 #include <stdio.h>
 #include <stdlib.h>
-#define ARRAY_SIZE 10000
-#define T 3600000
+#define ARRAY_SIZE 10
+#define T 360
 
 extern void gpuAdd(float *a, float *b, float *c, float size);
 
