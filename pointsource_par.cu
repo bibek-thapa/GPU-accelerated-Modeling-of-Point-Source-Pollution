@@ -7,15 +7,12 @@
 #define TIME 3600000
 
 
-__global__ void fillArray(float *a_d, float *b_d, float *c_d, float arraySize)
+__global__ void compute(float *a_d, float *b_d, float *c_d, float arraySize)
 {
 	int ix = blockIdx.x * blockDim.x + threadIdx.x;
 	int t = threadIdx.x;
 	int blockdim=blockDim.x;
-	
-
-	 
-
+		 
 	if(ix<arraySize){
 	if(ix==0){	
 		b_d[ix]=200.0;
@@ -23,19 +20,16 @@ __global__ void fillArray(float *a_d, float *b_d, float *c_d, float arraySize)
 		else{
 		b_d[ix]=0.0;
 		}
-	a_d[ix]=b_d[ix];
+	}
+	
 	
 	for(int k=0;k<TIME;k++) // time-loop
     {
 	if( ix > 0 && ix < arraySize-1){
-		__syncthreads();
 	   b_d[ix] = (b_d[ix+1]+b_d[ix-1])/2.0;
 	}
 	a_d[ix]=b_d[ix];
-
-    }
-
-	
+    	
 
 }		
 } 
@@ -60,7 +54,7 @@ extern "C" void pointsource_pollution (float *a, float *b, int *c, int arraySize
 	cudaMalloc ((void**) &c_d, sizeof(float) * arraySize);
 	
 
-	fillArray <<< ceil((float) arraySize/THREADS_PER_BLOCK), THREADS_PER_BLOCK >>> (a_d, b_d, c_d, arraySize);
+	compute <<< ceil((float) arraySize/THREADS_PER_BLOCK), THREADS_PER_BLOCK >>> (a_d, b_d, c_d, arraySize);
 	cudaMemcpy (a, a_d, sizeof(float) * arraySize, cudaMemcpyDeviceToHost);
 	
 	

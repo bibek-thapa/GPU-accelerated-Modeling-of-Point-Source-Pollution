@@ -3,8 +3,8 @@
 // Program to add two vectors using a GPU
 #include <stdio.h>
 #include <stdlib.h>
-#define ARRAY_SIZE 10
-#define T 360
+#define ARRAY_SIZE 10000
+#define T 3600000
 
 extern void gpuAdd(float *a, float *b, float *c, float size);
 
@@ -49,12 +49,18 @@ int main (int argc, char *argv[])
 
      printf("\n");
 
+    while(1){
     printf("Enter the position where you want to find the ppm");
     printf("\n");
     int x;
     scanf("%d",&x);
 
-    printf("The ppm at  is %f",a[x]);
+     printf("The ppm at  is %f",a[x]);
+     printf("\n");
+
+    }
+
+
 
    free (a);
    free (b);
