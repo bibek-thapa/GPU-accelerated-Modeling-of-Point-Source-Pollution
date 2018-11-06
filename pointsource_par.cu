@@ -9,43 +9,40 @@
 
 __global__ void compute(float *a_d, float *b_d, float *c_d, float arraySize)
 {
-	int ix = blockIdx.x * blockDim.x + threadIdx.x;
-	int t = threadIdx.x;
-	int blockdim=blockDim.x;
-		 
-	if(ix<arraySize){
-	if(ix==0){	
-		b_d[ix]=200.0;
-		}
-		else{
-		b_d[ix]=0.0;
-		}
-	}
-	
-	
-	for(int k=0;k<TIME;k++) // time-loop
-    {
-	if( ix > 0 && ix < arraySize-1){
-	   b_d[ix] = (b_d[ix+1]+b_d[ix-1])/2.0;
-	}
-	a_d[ix]=b_d[ix];
-    	
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;	
 
+	if( ix > 0 && ix < arraySize-1){
+	   b_d[ix] = (a_d[ix+1]+a_d[ix-1])/2.0;
+	}
+	__syncthreads();
+
+	
+		 	
 }		
-} 
+
+__global__ void initialize(float *a_d, float *b_d, float *c_d, float arraySize)
+{
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;	
+	if(ix==0)
+	{
+		a_d[ix]=200.0;
+		b_d[ix]=200.0;
+
+	}
+
+	else if (ix<arraySize)
+	{
+		a_d[ix]=0.0;
+		b_d[ix]=0.0;
+	}
+	
+
+}
+ 
 
 
 extern "C" void pointsource_pollution (float *a, float *b, int *c, int arraySize)
 {
-	int numDevices = 0;    
-	cudaGetDeviceCount(&numDevices); 
-	   if (numDevices > 1)
-	    {       int maxMultiprocessors = 0, maxDevice = 0; 
-	          for (int device=0; device<numDevices; device++) {          cudaDeviceProp props;          cudaGetDeviceProperties(&props, device); 
-	                   if (maxMultiprocessors < props.multiProcessorCount) {           
-	                     maxMultiprocessors = props.multiProcessorCount;  
-	                                maxDevice = device;          }       }    
-	       cudaSetDevice(maxDevice);   } 
 
 	float *a_d, *b_d, *c_d;
 
@@ -54,9 +51,16 @@ extern "C" void pointsource_pollution (float *a, float *b, int *c, int arraySize
 	cudaMalloc ((void**) &c_d, sizeof(float) * arraySize);
 	
 
+	initialize<<< ceil((float) arraySize/THREADS_PER_BLOCK), THREADS_PER_BLOCK >>> (a_d, b_d, c_d, arraySize);
+
+	for(int i=0;i<TIME;i++){
+
 	compute <<< ceil((float) arraySize/THREADS_PER_BLOCK), THREADS_PER_BLOCK >>> (a_d, b_d, c_d, arraySize);
-	cudaMemcpy (a, a_d, sizeof(float) * arraySize, cudaMemcpyDeviceToHost);
+	a_d=b_d;
 	
+	}
+
+	cudaMemcpy (a, a_d, sizeof(float) * arraySize, cudaMemcpyDeviceToHost);
 	
 	cudaError_t err = cudaGetLastError();
 	if (err != cudaSuccess)

@@ -19,26 +19,29 @@ int main (int argc, char *argv[])
     
   gettimeofday(&tv2, NULL);
 
-  printf ("Total time = %f seconds\n",
-         (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 +
-         (double) (tv2.tv_sec - tv1.tv_sec));
+
+  for(int i=0 ; i <ARRAY_SIZE ;i++)
+  {
+  	printf("%f \t ",a[i]);
+
+  }
 
   
 
+  printf ("Total time = %f seconds\n",
+         (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 +
+         (double) (tv2.tv_sec - tv1.tv_sec)); 
 
-   printf("Enter the position where you want to find the ppm");
+  while(1){
+    printf("Enter the position where you want to find the ppm");
     printf("\n");
     int x;
     scanf("%d",&x);
 
-    printf("The ppm at  is %f",a[x]); 
+     printf("The ppm at  is %f",a[x]);
+     printf("\n");
 
-
-    
-
-
-    
-           
+    }         
    free (a);
    free (b);
    free (c);
