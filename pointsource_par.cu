@@ -3,31 +3,18 @@
 #include <stdlib.h>
 
 
-#define THREADS_PER_BLOCK 32
+#define THREADS_PER_BLOCK 1024
 #define TIME 3600000
 
 
-__global__ void compute(float *a_d, float *b_d, float *c_d, float arraySize)
-{
-	int ix = blockIdx.x * blockDim.x + threadIdx.x;	
-
-	if( ix > 0 && ix < arraySize-1){
-	   b_d[ix] = (a_d[ix+1]+a_d[ix-1])/2.0;
-	}
-	__syncthreads();
-
-	
-		 	
-}		
-
-__global__ void initialize(float *a_d, float *b_d, float *c_d, float arraySize)
+__global__ void initialize(float *a_d, float *b_d, float *c_d, int arraySize)
 {
 	int ix = blockIdx.x * blockDim.x + threadIdx.x;	
 	if(ix==0)
 	{
 		a_d[ix]=200.0;
 		b_d[ix]=200.0;
-
+		
 	}
 
 	else if (ix<arraySize)
@@ -35,10 +22,26 @@ __global__ void initialize(float *a_d, float *b_d, float *c_d, float arraySize)
 		a_d[ix]=0.0;
 		b_d[ix]=0.0;
 	}
-	
 
 }
  
+
+__global__ void compute(float *a_d, float *b_d, float *c_d, int arraySize)
+{
+	int ix = blockIdx.x * blockDim.x + threadIdx.x;	
+	float temp;
+	if( ix > 0 && ix < arraySize-1){
+	    temp = (a_d[ix+1]+a_d[ix-1])/2.0;
+	    __syncthreads();
+	    b_d[ix]=temp;
+	    __syncthreads();
+	}
+
+
+				 	
+}		
+
+
 
 
 extern "C" void pointsource_pollution (float *a, float *b, int *c, int arraySize)
