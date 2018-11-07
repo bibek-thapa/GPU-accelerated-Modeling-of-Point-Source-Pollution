@@ -3,19 +3,18 @@
 #include <sys/time.h>
 #define ARRAY_SIZE 10000
 
-extern void pointsource_pollution(float *a, float *b, float *c, int size);
+extern void pointsource_pollution(float *a, float *b, int size);
 
 int main (int argc, char *argv[])
 {
    float *a = (float *) malloc(ARRAY_SIZE * sizeof(float ));
-   float *b = (float *) malloc(ARRAY_SIZE * sizeof(float ));
-   float *c = (float *) malloc(ARRAY_SIZE * sizeof(float ));
+   float *b = (float *) malloc(ARRAY_SIZE * sizeof(float )); 
    int i;
 
    struct timeval  tv1, tv2;
   	gettimeofday(&tv1, NULL);
 
-    pointsource_pollution(a,b,c,ARRAY_SIZE);
+    pointsource_pollution(a,b,ARRAY_SIZE);
     
   gettimeofday(&tv2, NULL);
 
